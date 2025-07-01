@@ -125,13 +125,14 @@ export function generateColorPalette(params = {}) {
   const saturationMultiplier = params.saturationMultiplier || 1.0; // 0.5 to 1.5
   const saturationOffset = params.saturationOffset || 0; // -20 to +20
   
-  // Define base hues for different color families
-  const baseHues = [
-    { name: 'Green', hue: 120, color: 'green' },
-    { name: 'Orange', hue: 30, color: 'orange' },
-    { name: 'Pink', hue: 330, color: 'pink' },
-    { name: 'Blue', hue: 220, color: 'blue' }
-  ];
+  // Extract optional parameters for Gaussian hue variation
+  const meanChroma = params.chroma?.mean || 0.6;
+  const stdDevChroma = params.chroma?.stdDev || 0.2;
+  const hueVariation = params.hueVariation || 0; // -30 to +30 degrees
+  
+  // Use custom colors if provided, otherwise use default extended set
+  const customColors = params.customColors;
+  const baseHues = customColors || getDefaultColorSet();
   
   // Define 10 lightness steps from light to dark with proper distribution
   const lightnessSteps = [95, 85, 75, 65, 55, 45, 35, 25, 15, 8];
@@ -186,12 +187,24 @@ export function generateColorPalette(params = {}) {
       // This keeps the deterministic nature while allowing customization
       let adjustedSaturation = saturation * saturationMultiplier + saturationOffset;
       
+      // Apply Gaussian-influenced saturation based on chroma parameters
+      if (meanChroma !== 0.6 || stdDevChroma !== 0.2) {
+        // Use Gaussian distribution to modify saturation
+        const chromaInfluence = gaussianRandom(meanChroma, stdDevChroma);
+        adjustedSaturation *= Math.max(0.3, Math.min(1.5, chromaInfluence));
+      }
+      
       // Clamp to valid saturation range (0-100%)
       adjustedSaturation = Math.max(0, Math.min(100, adjustedSaturation));
       
+      // Apply hue variation
+      let finalHue = baseHue.hue + hueVariation;
+      // Wrap hue to 0-360 range
+      finalHue = ((finalHue % 360) + 360) % 360;
+      
       const finalSaturation = adjustedSaturation;
       
-      const rgb = hslToRgb(baseHue.hue, finalSaturation, lightness);
+      const rgb = hslToRgb(finalHue, finalSaturation, lightness);
       const hex = rgbToHex(rgb.r, rgb.g, rgb.b);
       
       const white = { r: 255, g: 255, b: 255 };
@@ -205,7 +218,7 @@ export function generateColorPalette(params = {}) {
       row.colors.push({
         hex,
         rgb,
-        hsl: { h: baseHue.hue, s: finalSaturation, l: lightness },
+        hsl: { h: finalHue, s: finalSaturation, l: lightness },
         chroma: finalSaturation / 100, // Convert back to 0-1 range for chroma
         contrastWhite,
         contrastBlack,
@@ -213,7 +226,9 @@ export function generateColorPalette(params = {}) {
         bestContrast,
         step: index + 1,
         expectedContrast: index + 1, // Expected contrast should increase with step
-        baseSaturation: saturation // Store the base saturation for debugging
+        baseSaturation: saturation, // Store the base saturation for debugging
+        originalHue: baseHue.hue, // Store original hue for reference
+        adjustedHue: finalHue // Store adjusted hue for debugging
       });
     });
     
@@ -221,4 +236,61 @@ export function generateColorPalette(params = {}) {
   });
   
   return palette;
+}
+
+// Get default extended color set for palette generation
+export function getDefaultColorSet() {
+  return [
+    // Primary colors
+    { name: 'Blue', hue: 220, color: 'blue', category: 'primary' },
+    { name: 'Green', hue: 120, color: 'green', category: 'primary' },
+    { name: 'Red', hue: 0, color: 'red', category: 'primary' },
+    
+    // Secondary colors
+    { name: 'Orange', hue: 30, color: 'orange', category: 'secondary' },
+    { name: 'Purple', hue: 270, color: 'purple', category: 'secondary' },
+    { name: 'Cyan', hue: 180, color: 'cyan', category: 'secondary' },
+    
+    // Tertiary colors
+    { name: 'Pink', hue: 330, color: 'pink', category: 'tertiary' },
+    { name: 'Yellow', hue: 60, color: 'yellow', category: 'tertiary' },
+    { name: 'Teal', hue: 170, color: 'teal', category: 'tertiary' },
+    { name: 'Indigo', hue: 240, color: 'indigo', category: 'tertiary' },
+    
+    // Neutral tones
+    { name: 'Slate', hue: 210, color: 'slate', category: 'neutral' },
+    { name: 'Warm Gray', hue: 30, color: 'gray', category: 'neutral' }
+  ];
+}
+
+// Get predefined color sets for quick selection
+export function getPredefinedSets() {
+  return {
+    minimal: [
+      { name: 'Blue', hue: 220, color: 'blue' },
+      { name: 'Green', hue: 120, color: 'green' },
+      { name: 'Red', hue: 0, color: 'red' },
+      { name: 'Gray', hue: 210, color: 'slate' }
+    ],
+    vibrant: [
+      { name: 'Electric Blue', hue: 200, color: 'blue' },
+      { name: 'Lime Green', hue: 90, color: 'green' },
+      { name: 'Hot Pink', hue: 320, color: 'pink' },
+      { name: 'Bright Orange', hue: 25, color: 'orange' },
+      { name: 'Purple', hue: 280, color: 'purple' }
+    ],
+    earthy: [
+      { name: 'Forest Green', hue: 130, color: 'green' },
+      { name: 'Terracotta', hue: 15, color: 'orange' },
+      { name: 'Stone Blue', hue: 200, color: 'blue' },
+      { name: 'Moss Green', hue: 80, color: 'green' },
+      { name: 'Clay Brown', hue: 25, color: 'orange' }
+    ],
+    corporate: [
+      { name: 'Navy Blue', hue: 220, color: 'blue' },
+      { name: 'Professional Green', hue: 160, color: 'green' },
+      { name: 'Charcoal', hue: 210, color: 'slate' },
+      { name: 'Burgundy', hue: 350, color: 'red' }
+    ]
+  };
 }

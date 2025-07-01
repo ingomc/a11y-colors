@@ -1,10 +1,20 @@
 <script>
   import ColorGrid from './ColorGrid.svelte';
-  import { generateColorPalette } from '../utils/colorUtils.js';
+  import ControlPanel from './ControlPanel.svelte';
+  import ColorManager from './ColorManager.svelte';
+  import { generateColorPalette, getDefaultColorSet } from '../utils/colorUtils.js';
 
-  // Saturation adjustment parameters
+  // Original Gaussian distribution parameters (from ControlPanel)
+  let meanChroma = 0.6; // Set to 0.6 to move center of chroma curve to the right
+  let stdDevChroma = 0.2; // Standard deviation for chroma variation
+  
+  // Additional saturation adjustment parameters
   let saturationMultiplier = 1.0; // 0.5 to 1.5 - controls overall saturation intensity
   let saturationOffset = 0; // -20 to +20 - shifts the entire curve up/down
+  let hueVariation = 0; // -30 to +30 - shifts all hues
+  
+  // Color selection
+  let selectedColors = getDefaultColorSet();
   
   // Generated color palette (structured by rows and categories)
   let colors = [];
@@ -14,14 +24,23 @@
   
   function generatePalette() {
     colors = generateColorPalette({
+      chroma: { mean: meanChroma, stdDev: stdDevChroma },
       saturationMultiplier,
-      saturationOffset
+      saturationOffset,
+      hueVariation,
+      customColors: selectedColors
     });
   }
   
   // Auto-regenerate when sliders change
-  $: if (saturationMultiplier !== undefined && saturationOffset !== undefined) {
+  $: if (meanChroma !== undefined && stdDevChroma !== undefined && 
+        saturationMultiplier !== undefined && saturationOffset !== undefined &&
+        hueVariation !== undefined && selectedColors) {
     generatePalette();
+  }
+  
+  function handleColorChange(event) {
+    selectedColors = event.detail.colors;
   }
   
   function downloadColorTokens() {
@@ -56,7 +75,7 @@
   <div class="header-controls">
     <div class="title-section">
       <h2>Barrierefreie Farbpalette</h2>
-      <p>Deterministisches Design-System mit WCAG-Konformität</p>
+      <p>Kombiniert deterministisches Design-System mit anpassbaren Parametern</p>
     </div>
     
     <div class="action-buttons">
@@ -78,9 +97,19 @@
     </div>
   </div>
 
-  <!-- Saturation Controls -->
-  <div class="controls-section">
-    <h3>🎚️ Sättigungs-Anpassungen</h3>
+  <!-- Color Selection Manager -->
+  <ColorManager {selectedColors} on:change={handleColorChange} />
+
+  <!-- Original Gaussian Controls -->
+  <ControlPanel 
+    bind:meanChroma
+    bind:stdDevChroma
+    on:change={generatePalette}
+  />
+
+  <!-- Extended Saturation Controls -->
+  <div class="extended-controls">
+    <h3>� Erweiterte Anpassungen</h3>
     <div class="controls-grid">
       <div class="control-group">
         <label>
@@ -123,6 +152,27 @@
           </div>
         </label>
       </div>
+      
+      <div class="control-group">
+        <label>
+          <span class="control-label">
+            Farbton-Verschiebung: <strong>{hueVariation > 0 ? '+' : ''}{hueVariation}°</strong>
+          </span>
+          <input 
+            type="range" 
+            bind:value={hueVariation} 
+            min="-60" 
+            max="60" 
+            step="5"
+            class="slider"
+            aria-label="Hue variation adjustment"
+          />
+          <div class="range-labels">
+            <span>Kältere Töne</span>
+            <span>Wärmere Töne</span>
+          </div>
+        </label>
+      </div>
     </div>
   </div>
   
@@ -132,13 +182,19 @@
     <h3>🔬 Deterministischer Algorithmus</h3>
     <p>
       Diese Farbpalette verwendet eine feste Sättigungskurve basierend auf Design-System-Standards. 
-      Keine Zufallswerte - reproduzierbare und konsistente Ergebnisse für professionelle Design-Systeme.
+      Wählen Sie aus vorgefertigten Farbsets oder fügen Sie eigene Farben hinzu - 
+      reproduzierbare und konsistente Ergebnisse für professionelle Design-Systeme.
     </p>
-    <div class="saturation-preview">
-      <span class="label">Sättigungskurve:</span>
-      {#each [15, 35, 55, 75, 85, 90, 85, 75, 65, 55] as sat, i}
-        <span class="sat-value" style="background: hsl(200, {sat}%, 60%)">{sat}%</span>
-      {/each}
+    <div class="feature-highlights">
+      <div class="feature">
+        <strong>🎨 {selectedColors.length} Farben:</strong> Erweiterte Palette mit Presets
+      </div>
+      <div class="feature">
+        <strong>📏 Sättigungskurve:</strong> 
+        {#each [15, 35, 55, 75, 85, 90, 85, 75, 65, 55] as sat, i}
+          <span class="sat-value" style="background: hsl(200, {sat}%, 60%)">{sat}%</span>
+        {/each}
+      </div>
     </div>
   </div>
 </div>
@@ -158,7 +214,7 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
     gap: 2rem;
   }
   
@@ -211,25 +267,25 @@
     box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
   }
   
-  .controls-section {
+  .extended-controls {
     background: rgba(255, 255, 255, 0.7);
     border-radius: 12px;
-    padding: 1.5rem;
-    margin-bottom: 2rem;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
     border: 1px solid rgba(0, 0, 0, 0.1);
   }
   
-  .controls-section h3 {
-    margin: 0 0 1.5rem 0;
+  .extended-controls h3 {
+    margin: 0 0 0.75rem 0;
     color: #2d3748;
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 600;
   }
   
   .controls-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1.5rem;
+    gap: 1rem;
   }
   
   .control-group {
@@ -240,7 +296,7 @@
   .control-group label {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.5rem;
   }
   
   .control-label {
@@ -291,7 +347,7 @@
     justify-content: space-between;
     font-size: 0.75rem;
     color: #6b7280;
-    margin-top: -0.25rem;
+    margin-top: -0.125rem;
   }
   
   .algorithm-info {
@@ -315,17 +371,17 @@
     line-height: 1.6;
   }
   
-  .saturation-preview {
+  .feature-highlights {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .feature {
     display: flex;
     align-items: center;
     gap: 0.5rem;
     flex-wrap: wrap;
-  }
-  
-  .label {
-    font-weight: 600;
-    color: #2d3748;
-    margin-right: 0.5rem;
   }
   
   .sat-value {
@@ -359,10 +415,6 @@
     
     .controls-grid {
       grid-template-columns: 1fr;
-    }
-    
-    .saturation-preview {
-      justify-content: center;
     }
   }
 </style>

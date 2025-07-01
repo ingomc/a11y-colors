@@ -146,7 +146,7 @@ function runTests() {
   test('Color Palette: Correct Structure', () => {
     const palette = generateColorPalette({ chroma: { mean: 0.6, stdDev: 0.2 } });
     
-    assertEqual(palette.length, 4, 'Should have 4 color families');
+    assertEqual(palette.length, 12, 'Should have 12 color families');
     
     palette.forEach((row, index) => {
       assertEqual(row.colors.length, 10, `Row ${index} should have 10 color steps`);
@@ -192,11 +192,48 @@ function runTests() {
     });
   });
   
-  // Test 9: Base Hues
+  // Test 9: Base Hues (Extended Set)
   test('Color Palette: Base Hues', () => {
     const palette = generateColorPalette({ chroma: { mean: 0.6, stdDev: 0.2 } });
-    const expectedHues = [120, 30, 330, 220]; // Green, Orange, Pink, Blue
+    
+    // New extended color set - check first few colors
+    const expectedData = [
+      { name: 'Blue', hue: 220 },     // Row 0
+      { name: 'Green', hue: 120 },    // Row 1  
+      { name: 'Red', hue: 0 },        // Row 2
+      { name: 'Orange', hue: 30 }     // Row 3
+    ];
+    
+    expectedData.forEach((expected, index) => {
+      if (index < palette.length) {
+        const row = palette[index];
+        assertEqual(row.name, expected.name, `Row ${index} should be ${expected.name}`);
+        row.colors.forEach(color => {
+          assertEqual(color.hsl.h, expected.hue, 
+            `${row.name} should have hue ${expected.hue}`);
+        });
+      }
+    });
+  });
+  
+  // Test 9b: Original 4-Color Set (Backward Compatibility)
+  test('Color Palette: Original 4-Color Set', () => {
+    const originalColors = [
+      { name: 'Green', hue: 120, color: 'green' },
+      { name: 'Orange', hue: 30, color: 'orange' },
+      { name: 'Pink', hue: 330, color: 'pink' },
+      { name: 'Blue', hue: 220, color: 'blue' }
+    ];
+    
+    const palette = generateColorPalette({ 
+      chroma: { mean: 0.6, stdDev: 0.2 },
+      customColors: originalColors
+    });
+    
+    assertEqual(palette.length, 4, 'Should have 4 color families with custom colors');
+    
     const expectedNames = ['Green', 'Orange', 'Pink', 'Blue'];
+    const expectedHues = [120, 30, 330, 220];
     
     palette.forEach((row, index) => {
       assertEqual(row.name, expectedNames[index], `Row ${index} should be ${expectedNames[index]}`);
