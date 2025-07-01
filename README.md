@@ -2,7 +2,7 @@
 
 A modern web application built with Svelte and Vite that generates accessible color palettes with WCAG compliance validation. This tool uses deterministic saturation curves and design system best practices to create professional color palettes.
 
-🌐 **Live Demo**: [https://your-username.github.io/a11y-colors/](https://your-username.github.io/a11y-colors/)
+🌐 **Live Demo**: [https://ingomc.github.io/a11y-colors/](https://ingomc.github.io/a11y-colors/)
 
 ## Features
 
