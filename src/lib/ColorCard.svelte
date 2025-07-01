@@ -77,25 +77,28 @@
 <style>
   .color-card {
     width: 100%;
-    min-height: 120px;
-    padding: 0.5rem;
-    border-radius: 6px;
+    min-height: 140px;
+    padding: 0.75rem;
+    border-radius: 8px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: all 0.2s ease;
     border: 1px solid rgba(0, 0, 0, 0.1);
     box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
   }
   
   .color-card:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
   }
   
   .color-card:focus {
-    outline: 2px solid #3b82f6;
+    outline: 3px solid #3b82f6;
     outline-offset: 2px;
   }
   
@@ -103,22 +106,24 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
   }
   
   .step-number {
-    font-size: 0.75rem;
-    font-weight: 700;
-    opacity: 0.9;
+    font-size: 0.875rem;
+    font-weight: 800;
+    opacity: 0.95;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   }
   
   .accessibility-badge {
-    font-size: 0.625rem;
-    font-weight: 700;
-    padding: 0.2rem 0.4rem;
-    border-radius: 8px;
+    font-size: 0.6875rem;
+    font-weight: 800;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
     color: white;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
   
   .color-values {
@@ -131,23 +136,33 @@
   }
   
   .hex-value {
-    font-size: 0.875rem;
-    font-weight: 700;
+    font-size: 1rem;
+    font-weight: 800;
     text-transform: uppercase;
-    font-family: 'Monaco', 'Menlo', monospace;
+    font-family: 'SF Mono', 'Monaco', 'Menlo', monospace;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    letter-spacing: 0.5px;
   }
   
   .contrast-info {
-    margin-top: 0.5rem;
+    margin-top: 0.75rem;
+    background: rgba(0, 0, 0, 0.05);
+    padding: 0.5rem;
+    border-radius: 6px;
+    backdrop-filter: blur(4px);
   }
   
   .contrast-row {
     display: flex;
     justify-content: space-between;
-    font-size: 0.625rem;
-    opacity: 0.9;
-    margin-bottom: 0.125rem;
-    font-family: 'Monaco', 'Menlo', monospace;
+    font-size: 0.6875rem;
+    opacity: 0.95;
+    margin-bottom: 0.1875rem;
+    font-family: 'SF Mono', 'Monaco', 'Menlo', monospace;
+  }
+  
+  .contrast-row:last-child {
+    margin-bottom: 0;
   }
   
   .contrast-label {
@@ -160,16 +175,25 @@
   
   @media (max-width: 768px) {
     .color-card {
-      min-height: 100px;
-      padding: 0.5rem;
+      min-height: 120px;
+      padding: 0.625rem;
     }
     
     .hex-value {
-      font-size: 0.75rem;
+      font-size: 0.875rem;
     }
     
     .contrast-row {
-      font-size: 0.5rem;
+      font-size: 0.625rem;
+    }
+    
+    .step-number {
+      font-size: 0.75rem;
+    }
+    
+    .accessibility-badge {
+      font-size: 0.625rem;
+      padding: 0.1875rem 0.375rem;
     }
   }
 </style>

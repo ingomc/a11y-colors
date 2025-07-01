@@ -5,9 +5,8 @@
 </script>
 
 <div class="color-palette">
-  <!-- Header with category labels -->
+  <!-- Header with step numbers -->
   <div class="palette-header">
-    <div class="hue-label"></div>
     <div class="step-number">1</div>
     <div class="step-number">2</div>
     <div class="step-number">3</div>
@@ -20,20 +19,21 @@
     <div class="step-number">10</div>
   </div>
   
-  <!-- Category labels row -->
+  <!-- Category labels row aligned with columns -->
   <div class="category-labels">
-    <div class="hue-label"></div>
     <div class="category-label surface-label">surface (3-5)</div>
     <div class="category-label border-label">border (6-8)</div>
     <div class="category-label text-label">text (9-10)</div>
   </div>
   
   <!-- Color rows -->
-  {#each colors as row}
+  {#each colors as row, rowIndex}
+    {#if rowIndex > 0}
+      <div class="row-title">{row.name}</div>
+    {:else}
+      <div class="row-title first-row">{row.name}</div>
+    {/if}
     <div class="color-row">
-      <div class="row-label">
-        <span class="hue-name">{row.name}</span>
-      </div>
       {#each row.colors as color, index}
         <ColorCard {color} step={index + 1} />
       {/each}
@@ -51,8 +51,8 @@
   
   .palette-header {
     display: grid;
-    grid-template-columns: 100px repeat(10, 1fr);
-    gap: 0.5rem;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 0.75rem;
     margin-bottom: 0.5rem;
     align-items: center;
   }
@@ -66,140 +66,116 @@
   }
   
   .category-labels {
-    display: grid;
-    grid-template-columns: 100px 1fr 1fr 1fr;
-    gap: 0.5rem;
+    display: flex;
+    gap: 0.75rem;
     margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 2px solid #e2e8f0;
     align-items: center;
-  }
-  
-  .hue-label {
-    /* Empty space above row labels */
-    background: transparent;
+    padding: 0 0.375rem; /* Align with grid padding */
   }
   
   .category-label {
     text-align: center;
-    padding: 0.5rem;
-    font-size: 0.875rem;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.6875rem;
     font-weight: 600;
     color: #475569;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    white-space: nowrap;
   }
   
   .surface-label {
-    /* Covers columns 1-3 */
+    flex: 3; /* 3 columns wide (3-5) */
+    margin-left: calc(20% + 0.375rem); /* Skip first 2 columns */
   }
   
   .border-label {
-    /* Covers columns 4-6 */
+    flex: 3; /* 3 columns wide (6-8) */
   }
   
   .text-label {
-    /* Covers columns 7-10 */
+    flex: 2; /* 2 columns wide (9-10) */
+  }
+  
+  .row-title {
+    font-weight: 700;
+    color: #1e293b;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 1.5rem 0 0.75rem 0;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  
+  .row-title.first-row {
+    margin-top: 0;
   }
   
   .color-row {
     display: grid;
-    grid-template-columns: 100px repeat(10, 1fr);
-    gap: 0.5rem;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 0.75rem;
     margin-bottom: 1.5rem;
     align-items: start;
   }
   
-  .row-label {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    min-height: 120px;
-    background: #f8fafc;
-    border-radius: 8px;
-    border: 1px solid #e2e8f0;
-  }
-  
-  .hue-name {
-    font-weight: 700;
-    color: #1e293b;
-    font-size: 0.875rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    text-align: center;
-  }
-  
   @media (max-width: 768px) {
     .color-palette {
-      padding: 0.75rem;
-    }
-    
-    .palette-header,
-    .color-row {
-      grid-template-columns: 80px 1fr;
-      gap: 0.75rem;
+      padding: 0.5rem;
     }
     
     .palette-header {
-      display: flex;
-      flex-wrap: wrap;
-      border-bottom: 1px solid #e2e8f0;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 0.375rem;
     }
     
-    .category-header {
-      display: none; /* Hide on mobile, show as row headers instead */
+    .category-labels {
+      gap: 0.375rem;
+      margin-bottom: 0.75rem;
+      padding: 0 0.1875rem;
+    }
+    
+    .category-label {
+      font-size: 0.625rem;
+      padding: 0.25rem 0.5rem;
+    }
+    
+    .surface-label {
+      margin-left: calc(20% + 0.1875rem);
     }
     
     .color-row {
-      display: block;
-      margin-bottom: 2rem;
-      border-bottom: 1px solid #f1f5f9;
-      padding-bottom: 1rem;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 0.375rem;
+      margin-bottom: 1.25rem;
     }
     
-    .row-label {
-      margin-bottom: 1rem;
-      min-height: 60px;
+    .row-title {
+      font-size: 0.875rem;
+      margin: 1rem 0 0.5rem 0;
     }
     
-    .category-group {
-      margin-bottom: 1rem;
-      padding: 0.5rem;
-      background: #f8fafc;
-      border-radius: 8px;
+    .step-number {
+      font-size: 0.625rem;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .palette-header {
+      grid-template-columns: repeat(5, 1fr);
     }
     
-    .category-group::before {
-      content: attr(class);
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: #64748b;
-      text-transform: uppercase;
-      margin-bottom: 0.5rem;
-      display: block;
+    .category-labels {
+      display: none; /* Hide category labels on very small screens */
     }
     
-    .surface-group::before {
-      content: "Surface (3-5)";
-    }
-    
-    .border-group::before {
-      content: "Border (6-8)";
-    }
-    
-    .text-group::before {
-      content: "Text (9-10)";
-    }
-    
-    .category-group {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-      gap: 0.5rem;
-    }
-    
-    .hue-name {
-      font-size: 0.75rem;
+    .color-row {
+      grid-template-columns: repeat(5, 1fr);
     }
   }
 </style>

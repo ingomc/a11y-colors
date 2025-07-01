@@ -1,5 +1,7 @@
 <script>
   import ColorPaletteGenerator from './lib/ColorPaletteGenerator.svelte'
+  import ColorLogicExplanation from './lib/ColorLogicExplanation.svelte'
+  import TestRunner from './lib/TestRunner.svelte'
 </script>
 
 <main>
@@ -7,6 +9,10 @@
   <p class="subtitle">Generate accessible color palettes with WCAG compliance</p>
   
   <ColorPaletteGenerator />
+  
+  <ColorLogicExplanation />
+  
+  <TestRunner />
 </main>
 
 <style>

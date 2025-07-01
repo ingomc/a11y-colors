@@ -1,5 +1,5 @@
 // Gaussian random number generator using Box-Muller transform
-function gaussianRandom(mean = 0, stdDev = 1) {
+export function gaussianRandom(mean = 0, stdDev = 1) {
   let u = 0, v = 0;
   while(u === 0) u = Math.random(); // Converting [0,1) to (0,1)
   while(v === 0) v = Math.random();
@@ -9,7 +9,7 @@ function gaussianRandom(mean = 0, stdDev = 1) {
 }
 
 // Convert HSL to RGB
-function hslToRgb(h, s, l) {
+export function hslToRgb(h, s, l) {
   h = h / 360;
   s = s / 100;
   l = l / 100;
@@ -43,7 +43,7 @@ function hslToRgb(h, s, l) {
 }
 
 // Convert RGB to HEX
-function rgbToHex(r, g, b) {
+export function rgbToHex(r, g, b) {
   return "#" + [r, g, b].map(x => {
     const hex = x.toString(16);
     return hex.length === 1 ? "0" + hex : hex;
@@ -51,7 +51,7 @@ function rgbToHex(r, g, b) {
 }
 
 // Calculate relative luminance
-function relativeLuminance(r, g, b) {
+export function relativeLuminance(r, g, b) {
   const [rs, gs, bs] = [r, g, b].map(c => {
     c = c / 255;
     return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
@@ -119,7 +119,6 @@ function generateColor(hueParams, satParams, lightParams) {
 
 // Generate a structured color palette with base hues and chroma variations
 export function generateColorPalette(params) {
-  const { chroma } = params;
   const palette = [];
   
   // Define base hues for different color families
@@ -130,9 +129,8 @@ export function generateColorPalette(params) {
     { name: 'Blue', hue: 220, color: 'blue' }
   ];
   
-  // Define 10 predefined lightness steps from very light to very dark
-  const predefinedLightness = [95, 90, 85, 75, 65, 55, 45, 35, 25, 15];
-  const contrastTargets = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  // Define 10 lightness steps from light to dark with proper distribution
+  const lightnessSteps = [95, 85, 75, 65, 55, 45, 35, 25, 15, 8];
   
   baseHues.forEach(baseHue => {
     const row = {
@@ -141,16 +139,48 @@ export function generateColorPalette(params) {
       colors: []
     };
     
-    predefinedLightness.forEach((lightness, index) => {
-      // Use Gaussian function to calculate chroma based on predefined lightness
-      // Mean is set to 0.6 to move center of chroma curve to the right
-      const chromaVariation = gaussianRandom(chroma.mean, chroma.stdDev);
+    lightnessSteps.forEach((lightness, index) => {
+      // Use a predictable saturation curve based on design system best practices
+      // Similar to Material Design, Tailwind CSS, and other established systems
+      let saturation;
       
-      // Convert chroma to saturation (chroma is saturation * lightness / 100)
-      // Clamp chroma between 0 and 1, then convert to saturation percentage
-      const clampedChroma = Math.max(0, Math.min(1, chromaVariation));
-      const saturation = lightness > 0 ? (clampedChroma * 100 * 100) / lightness : 50;
-      const finalSaturation = Math.max(0, Math.min(100, saturation));
+      // Saturation curve that peaks in the middle ranges and reduces at extremes
+      // This follows the principle that very light and very dark colors should be less saturated
+      if (lightness >= 90) {
+        // Steps 1: Very light colors (10-20% saturation)
+        saturation = 15;
+      } else if (lightness >= 80) {
+        // Step 2: Light colors (30-40% saturation)
+        saturation = 35;
+      } else if (lightness >= 70) {
+        // Step 3: Light-medium colors (50-60% saturation)
+        saturation = 55;
+      } else if (lightness >= 60) {
+        // Step 4: Medium colors (70-80% saturation)
+        saturation = 75;
+      } else if (lightness >= 50) {
+        // Step 5: Medium colors (80-90% saturation)
+        saturation = 85;
+      } else if (lightness >= 40) {
+        // Step 6: Medium-dark colors (85-95% saturation)
+        saturation = 90;
+      } else if (lightness >= 30) {
+        // Step 7: Dark colors (80-90% saturation)
+        saturation = 85;
+      } else if (lightness >= 20) {
+        // Step 8: Very dark colors (70-80% saturation)
+        saturation = 75;
+      } else if (lightness >= 10) {
+        // Step 9: Extremely dark colors (60-70% saturation)
+        saturation = 65;
+      } else {
+        // Step 10: Nearly black (50-60% saturation)
+        saturation = 55;
+      }
+      
+      // For design system consistency, use fixed saturation values
+      // No random variation - predictable and reproducible results
+      const finalSaturation = saturation;
       
       const rgb = hslToRgb(baseHue.hue, finalSaturation, lightness);
       const hex = rgbToHex(rgb.r, rgb.g, rgb.b);
@@ -167,13 +197,14 @@ export function generateColorPalette(params) {
         hex,
         rgb,
         hsl: { h: baseHue.hue, s: finalSaturation, l: lightness },
-        chroma: clampedChroma,
+        chroma: finalSaturation / 100, // Convert back to 0-1 range for chroma
         contrastWhite,
         contrastBlack,
         accessibility,
         bestContrast,
         step: index + 1,
-        expectedContrast: contrastTargets[index]
+        expectedContrast: index + 1, // Expected contrast should increase with step
+        baseSaturation: saturation // Store the base saturation for debugging
       });
     });
     
