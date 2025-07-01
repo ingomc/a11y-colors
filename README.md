@@ -1,22 +1,62 @@
 # Accessible UI Color Palette Generator
 
-A modern web application built with Svelte and Vite that generates accessible color palettes with WCAG compliance validation. This tool uses Gaussian distribution parameters to create scientifically-based color variations while ensuring accessibility standards.
+A modern web application built with Svelte and Vite that generates accessible color palettes with WCAG compliance validation. This tool uses deterministic saturation curves and design system best practices to create professional color palettes.
+
+🌐 **Live Demo**: [https://your-username.github.io/a11y-colors/](https://your-username.github.io/a11y-colors/)
 
 ## Features
 
-- 🎨 **Smart Color Generation**: Uses Gaussian distribution for natural color variations
+- 🎨 **Design System Colors**: Deterministic saturation curves based on Material Design and Tailwind CSS
 - ♿ **WCAG Compliance**: Real-time contrast ratio validation (AA/AAA standards)
 - 📊 **Accessibility Ratings**: Visual indicators for each color's accessibility level
-- 📥 **W3C Token Export**: Download color palettes in W3C Design Token format
+- 🧪 **Automated Testing**: Comprehensive test suite for all color calculation functions
 - 📱 **Responsive Design**: Works seamlessly on desktop and mobile devices
 - 🎯 **Click to Copy**: Easy hex code copying with a single click
+- 📖 **Educational**: Built-in explanations of color theory and accessibility principles
 
 ## Technical Features
 
-- **Gaussian Parameters**: Customizable mean and standard deviation for hue, saturation, and lightness
-- **Contrast Calculations**: Precise WCAG contrast ratio calculations against white and black backgrounds
-- **Real-time Updates**: Live palette generation as you adjust parameters
+- **Deterministic Algorithm**: Reproducible color palettes with no random variation
+- **Saturation Curve**: [15%, 35%, 55%, 75%, 85%, 90%, 85%, 75%, 65%, 55%] for optimal perception
+- **Contrast Calculations**: Precise WCAG contrast ratio calculations
+- **Real-time Validation**: Live accessibility feedback
 - **Modern UI**: Beautiful gradient backgrounds and smooth animations
+
+## Deployment to GitHub Pages
+
+### Automatic Deployment (Recommended)
+
+1. **Fork or clone this repository**
+2. **Push to your GitHub repository**
+3. **Enable GitHub Pages**:
+   - Go to repository Settings → Pages
+   - Source: "GitHub Actions"
+4. **The app will automatically deploy on each push to main branch**
+
+### Manual Deployment
+
+```bash
+# Build the application
+npm run build
+
+# The dist/ folder contains the static files ready for deployment
+```
+
+## Local Development
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
+```
 
 ## Getting Started
 
