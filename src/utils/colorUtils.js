@@ -117,9 +117,13 @@ function generateColor(hueParams, satParams, lightParams) {
   };
 }
 
-// Generate a structured color palette with base hues and chroma variations
-export function generateColorPalette(params) {
+// Generate a structured color palette with base hues and customizable saturation
+export function generateColorPalette(params = {}) {
   const palette = [];
+  
+  // Extract optional parameters for saturation adjustment
+  const saturationMultiplier = params.saturationMultiplier || 1.0; // 0.5 to 1.5
+  const saturationOffset = params.saturationOffset || 0; // -20 to +20
   
   // Define base hues for different color families
   const baseHues = [
@@ -178,9 +182,14 @@ export function generateColorPalette(params) {
         saturation = 55;
       }
       
-      // For design system consistency, use fixed saturation values
-      // No random variation - predictable and reproducible results
-      const finalSaturation = saturation;
+      // Apply user adjustments to the base saturation curve
+      // This keeps the deterministic nature while allowing customization
+      let adjustedSaturation = saturation * saturationMultiplier + saturationOffset;
+      
+      // Clamp to valid saturation range (0-100%)
+      adjustedSaturation = Math.max(0, Math.min(100, adjustedSaturation));
+      
+      const finalSaturation = adjustedSaturation;
       
       const rgb = hslToRgb(baseHue.hue, finalSaturation, lightness);
       const hex = rgbToHex(rgb.r, rgb.g, rgb.b);
